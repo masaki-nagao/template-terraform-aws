@@ -73,9 +73,9 @@ resource "aws_eip" "private" {
 }
 
 resource "aws_nat_gateway" "private" {
-  count         = length(var.private_subnet_cidrs)
+  count         = length(var.public_subnet_cidrs)
   allocation_id = element(aws_eip.private.*.id,count.index)
-  subnet_id     = element(aws_subnet.private.*.id,count.index)
+  subnet_id     = element(aws_subnet.public.*.id,count.index)
 }
 
 resource "aws_route" "private" {
@@ -117,6 +117,24 @@ resource "aws_network_acl" "public" {
     to_port    = 22
   }
 
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 300
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
+  }
+
+  ingress {
+    protocol   = "-1"
+    rule_no    = 400
+    action     = "allow"
+    cidr_block = var.cidr
+    from_port  = 0
+    to_port    = 0
+  }
+
   egress {
     protocol   = "-1"
     rule_no    = 100
@@ -144,11 +162,20 @@ resource "aws_network_acl" "private" {
     to_port    = 0
   }
 
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 200
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
+  }
+
   egress {
     protocol   = "-1"
     rule_no    = 100
     action     = "allow"
-    cidr_block = var.cidr
+    cidr_block = "0.0.0.0/0"
     from_port  = 0
     to_port    = 0
   }

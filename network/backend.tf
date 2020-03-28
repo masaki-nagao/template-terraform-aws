@@ -3,7 +3,7 @@ terraform {
   backend "s3" {
     bucket  = "m-nagao-terrafrom-tfstate"
     region  = "ap-northeast-1"
-    key     = "sample/network"
+    key     = "network/terraform.tfstate"
     encrypt = true
   }
 }

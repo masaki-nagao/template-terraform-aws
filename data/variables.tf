@@ -1,6 +1,9 @@
-data "aws_vpc" "default" {
-  filter {
-    name   = "Name"
-    values = ["default"]
+data "terraform_remote_state" "network" {
+  backend = "s3"
+
+  config = {
+    bucket  = "m-nagao-terrafrom-tfstate"
+    region  = "ap-northeast-1"
+    key     = "network/terraform.tfstate" 
   }
 }
